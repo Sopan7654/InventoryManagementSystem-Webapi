@@ -58,12 +58,12 @@ namespace InventoryManagementSystem
 
         static void ShowMainMenu()
         {
-            var productMenu  = new ProductMenu();
-            var inventoryMenu= new InventoryMenu();
-            var reportMenu   = new ReportMenu();
+            var productMenu = new ProductMenu();
+            var inventoryMenu = new InventoryMenu();
+            var reportMenu = new ReportMenu();
             var supplierMenu = new SupplierMenu();
-            var warehouseMenu= new WarehouseMenu();
-            var poMenu       = new PurchaseOrderMenu();
+            var warehouseMenu = new WarehouseMenu();
+            var poMenu = new PurchaseOrderMenu();
 
             while (true)
             {
@@ -71,7 +71,7 @@ namespace InventoryManagementSystem
                 Console.ForegroundColor = ConsoleColor.Cyan;
                 Console.WriteLine(@"
   ╔══════════════════════════════════════════════════════════════╗
-  ║          INVENTORY MANAGEMENT SYSTEM  v1.0                  ║
+  ║          INVENTORY MANAGEMENT SYSTEM  v1.0                   ║
   ╚══════════════════════════════════════════════════════════════╝");
                 Console.ResetColor();
 
@@ -91,12 +91,12 @@ namespace InventoryManagementSystem
 
                 switch (choice)
                 {
-                    case "1": productMenu.Show();   break;
-                    case "2": inventoryMenu.Show();  break;
-                    case "3": poMenu.Show();          break;
-                    case "4": supplierMenu.Show();    break;
-                    case "5": warehouseMenu.Show();   break;
-                    case "6": reportMenu.Show();      break;
+                    case "1": productMenu.Show(); break;
+                    case "2": inventoryMenu.Show(); break;
+                    case "3": poMenu.Show(); break;
+                    case "4": supplierMenu.Show(); break;
+                    case "5": warehouseMenu.Show(); break;
+                    case "6": reportMenu.Show(); break;
                     case "0":
                         Console.ForegroundColor = ConsoleColor.Green;
                         Console.WriteLine("\n  Goodbye!\n");

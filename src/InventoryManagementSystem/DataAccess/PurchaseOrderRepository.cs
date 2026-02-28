@@ -12,9 +12,14 @@ namespace InventoryManagementSystem.DataAccess
             using var conn = DatabaseHelper.GetConnection();
             conn.Open();
             string sql = @"SELECT po.PurchaseOrderId, po.SupplierId, s.SupplierName,
-                                  po.OrderDate, po.Status
+                                  po.OrderDate, po.Status,
+                                  COUNT(poi.POItemId)        AS ItemCount,
+                                  COALESCE(SUM(poi.QuantityOrdered * poi.UnitPrice), 0) AS TotalAmount
                            FROM PurchaseOrder po
                            JOIN Supplier s ON s.SupplierId = po.SupplierId
+                           LEFT JOIN PurchaseOrderItem poi ON poi.PurchaseOrderId = po.PurchaseOrderId
+                           GROUP BY po.PurchaseOrderId, po.SupplierId, s.SupplierName,
+                                    po.OrderDate, po.Status
                            ORDER BY po.OrderDate DESC";
             using var cmd = new MySqlCommand(sql, conn);
             using var rdr = cmd.ExecuteReader();
@@ -28,10 +33,10 @@ namespace InventoryManagementSystem.DataAccess
             conn.Open();
             string sql = "INSERT INTO PurchaseOrder(PurchaseOrderId,SupplierId,OrderDate,Status) VALUES(@id,@sid,@date,@st)";
             using var cmd = new MySqlCommand(sql, conn);
-            cmd.Parameters.AddWithValue("@id",   po.PurchaseOrderId);
-            cmd.Parameters.AddWithValue("@sid",  po.SupplierId);
+            cmd.Parameters.AddWithValue("@id", po.PurchaseOrderId);
+            cmd.Parameters.AddWithValue("@sid", po.SupplierId);
             cmd.Parameters.AddWithValue("@date", po.OrderDate.Date);
-            cmd.Parameters.AddWithValue("@st",   po.Status);
+            cmd.Parameters.AddWithValue("@st", po.Status);
             return cmd.ExecuteNonQuery() > 0;
         }
 
@@ -41,10 +46,10 @@ namespace InventoryManagementSystem.DataAccess
             conn.Open();
             string sql = "INSERT INTO PurchaseOrderItem(POItemId,PurchaseOrderId,ProductId,QuantityOrdered,UnitPrice) VALUES(@id,@poid,@pid,@qty,@price)";
             using var cmd = new MySqlCommand(sql, conn);
-            cmd.Parameters.AddWithValue("@id",    item.POItemId);
-            cmd.Parameters.AddWithValue("@poid",  item.PurchaseOrderId);
-            cmd.Parameters.AddWithValue("@pid",   item.ProductId);
-            cmd.Parameters.AddWithValue("@qty",   item.QuantityOrdered);
+            cmd.Parameters.AddWithValue("@id", item.POItemId);
+            cmd.Parameters.AddWithValue("@poid", item.PurchaseOrderId);
+            cmd.Parameters.AddWithValue("@pid", item.ProductId);
+            cmd.Parameters.AddWithValue("@qty", item.QuantityOrdered);
             cmd.Parameters.AddWithValue("@price", item.UnitPrice);
             return cmd.ExecuteNonQuery() > 0;
         }
@@ -76,23 +81,40 @@ namespace InventoryManagementSystem.DataAccess
             return cmd.ExecuteNonQuery() > 0;
         }
 
-        private static PurchaseOrder MapPO(MySqlDataReader r) => new()
+        private static PurchaseOrder MapPO(MySqlDataReader r)
         {
-            PurchaseOrderId = r["PurchaseOrderId"].ToString()!,
-            SupplierId      = r["SupplierId"].ToString()!,
-            SupplierName    = r["SupplierName"].ToString()!,
-            OrderDate       = Convert.ToDateTime(r["OrderDate"]),
-            Status          = r["Status"].ToString()!
-        };
+            var po = new PurchaseOrder
+            {
+                PurchaseOrderId = r["PurchaseOrderId"].ToString()!,
+                SupplierId = r["SupplierId"].ToString()!,
+                SupplierName = r["SupplierName"].ToString()!,
+                OrderDate = Convert.ToDateTime(r["OrderDate"]),
+                Status = r["Status"].ToString()!
+            };
+
+            // These columns are only present in the GetAll() aggregated query
+            if (HasColumn(r, "ItemCount")) po.ItemCount = Convert.ToInt32(r["ItemCount"]);
+            if (HasColumn(r, "TotalAmount")) po.TotalAmount = Convert.ToDecimal(r["TotalAmount"]);
+
+            return po;
+        }
+
+        private static bool HasColumn(MySqlDataReader r, string columnName)
+        {
+            for (int i = 0; i < r.FieldCount; i++)
+                if (r.GetName(i).Equals(columnName, StringComparison.OrdinalIgnoreCase))
+                    return true;
+            return false;
+        }
 
         private static PurchaseOrderItem MapItem(MySqlDataReader r) => new()
         {
-            POItemId        = r["POItemId"].ToString()!,
+            POItemId = r["POItemId"].ToString()!,
             PurchaseOrderId = r["PurchaseOrderId"].ToString()!,
-            ProductId       = r["ProductId"].ToString()!,
-            ProductName     = r["ProductName"].ToString()!,
+            ProductId = r["ProductId"].ToString()!,
+            ProductName = r["ProductName"].ToString()!,
             QuantityOrdered = Convert.ToDecimal(r["QuantityOrdered"]),
-            UnitPrice       = Convert.ToDecimal(r["UnitPrice"])
+            UnitPrice = Convert.ToDecimal(r["UnitPrice"])
         };
     }
 }

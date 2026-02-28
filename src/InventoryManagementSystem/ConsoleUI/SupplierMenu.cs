@@ -55,9 +55,9 @@ namespace InventoryManagementSystem.ConsoleUI
             {
                 SupplierId   = ConsoleHelper.AskRequired("Supplier ID (e.g. S6)"),
                 SupplierName = ConsoleHelper.AskRequired("Supplier Name"),
-                Email        = ConsoleHelper.AskInput("Email"),
-                Phone        = ConsoleHelper.AskInput("Phone"),
-                Website      = ConsoleHelper.AskInput("Website")
+                Email        = ConsoleHelper.AskInput("Email (optional)"),
+                Phone        = ConsoleHelper.AskInput("Phone (optional)"),
+                Website      = ConsoleHelper.AskInput("Website (optional)")
             };
 
             bool ok = _repo.Insert(s);

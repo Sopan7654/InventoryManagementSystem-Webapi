@@ -81,16 +81,16 @@ namespace InventoryManagementSystem.DataAccess
             }
             else
             {
-                string newId = "SL-" + DateTime.Now.Ticks;
+                string newId = Guid.NewGuid().ToString();
                 string ins = @"INSERT INTO StockLevel(StockLevelId,ProductId,WarehouseId,QuantityOnHand,ReorderLevel,SafetyStock,ReservedQuantity)
                                VALUES(@id,@pid,@wid,@qty,@ro,@ss,0)";
                 using var cmd3 = new MySqlCommand(ins, conn);
-                cmd3.Parameters.AddWithValue("@id",  newId);
+                cmd3.Parameters.AddWithValue("@id", newId);
                 cmd3.Parameters.AddWithValue("@pid", productId);
                 cmd3.Parameters.AddWithValue("@wid", warehouseId);
                 cmd3.Parameters.AddWithValue("@qty", qty);
-                cmd3.Parameters.AddWithValue("@ro",  reorder);
-                cmd3.Parameters.AddWithValue("@ss",  safety);
+                cmd3.Parameters.AddWithValue("@ro", reorder);
+                cmd3.Parameters.AddWithValue("@ss", safety);
                 cmd3.ExecuteNonQuery();
             }
         }
@@ -102,8 +102,8 @@ namespace InventoryManagementSystem.DataAccess
             string sql = "UPDATE StockLevel SET QuantityOnHand=QuantityOnHand+@delta WHERE ProductId=@pid AND WarehouseId=@wid";
             using var cmd = new MySqlCommand(sql, conn);
             cmd.Parameters.AddWithValue("@delta", delta);
-            cmd.Parameters.AddWithValue("@pid",   productId);
-            cmd.Parameters.AddWithValue("@wid",   warehouseId);
+            cmd.Parameters.AddWithValue("@pid", productId);
+            cmd.Parameters.AddWithValue("@wid", warehouseId);
             return cmd.ExecuteNonQuery() > 0;
         }
 
@@ -114,21 +114,21 @@ namespace InventoryManagementSystem.DataAccess
             string sql = "UPDATE StockLevel SET ReservedQuantity=ReservedQuantity+@delta WHERE ProductId=@pid AND WarehouseId=@wid";
             using var cmd = new MySqlCommand(sql, conn);
             cmd.Parameters.AddWithValue("@delta", delta);
-            cmd.Parameters.AddWithValue("@pid",   productId);
-            cmd.Parameters.AddWithValue("@wid",   warehouseId);
+            cmd.Parameters.AddWithValue("@pid", productId);
+            cmd.Parameters.AddWithValue("@wid", warehouseId);
             return cmd.ExecuteNonQuery() > 0;
         }
 
         private static StockLevel Map(MySqlDataReader r) => new()
         {
-            StockLevelId     = r["StockLevelId"].ToString()!,
-            ProductId        = r["ProductId"].ToString()!,
-            ProductName      = r["ProductName"].ToString()!,
-            WarehouseId      = r["WarehouseId"].ToString()!,
-            WarehouseName    = r["WarehouseName"].ToString()!,
-            QuantityOnHand   = Convert.ToDecimal(r["QuantityOnHand"]),
-            ReorderLevel     = Convert.ToDecimal(r["ReorderLevel"]),
-            SafetyStock      = Convert.ToDecimal(r["SafetyStock"]),
+            StockLevelId = r["StockLevelId"].ToString()!,
+            ProductId = r["ProductId"].ToString()!,
+            ProductName = r["ProductName"].ToString()!,
+            WarehouseId = r["WarehouseId"].ToString()!,
+            WarehouseName = r["WarehouseName"].ToString()!,
+            QuantityOnHand = Convert.ToDecimal(r["QuantityOnHand"]),
+            ReorderLevel = Convert.ToDecimal(r["ReorderLevel"]),
+            SafetyStock = Convert.ToDecimal(r["SafetyStock"]),
             ReservedQuantity = Convert.ToDecimal(r["ReservedQuantity"])
         };
     }

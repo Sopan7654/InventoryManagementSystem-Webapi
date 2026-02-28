@@ -59,7 +59,7 @@ namespace InventoryManagementSystem.ConsoleUI
             {
                 WarehouseId   = ConsoleHelper.AskRequired("Warehouse ID (e.g. W4)"),
                 WarehouseName = ConsoleHelper.AskRequired("Warehouse Name"),
-                Location      = ConsoleHelper.AskInput("Location"),
+                Location      = ConsoleHelper.AskInput("Location (optional)"),
                 Capacity      = null
             };
             string capStr = ConsoleHelper.AskInput("Capacity (optional)");

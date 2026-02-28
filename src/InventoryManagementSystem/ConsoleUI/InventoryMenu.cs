@@ -74,11 +74,12 @@ namespace InventoryManagementSystem.ConsoleUI
             string pid = ConsoleHelper.AskRequired("Product ID");
             string wid = ConsoleHelper.AskRequired("Warehouse ID");
             decimal qty = ConsoleHelper.AskDecimal("Quantity");
-            string ref_ = ConsoleHelper.AskInput("Reference (PO number, etc.)");
 
-            var (ok, msg) = _service.StockIn(pid, wid, qty, ref_);
+            if (qty <= 0) { ConsoleHelper.PrintError("Quantity must be greater than zero."); return; }
+
+            var (ok, msg) = _service.StockIn(pid, wid, qty);
             if (ok) ConsoleHelper.PrintSuccess(msg);
-            else    ConsoleHelper.PrintError(msg);
+            else ConsoleHelper.PrintError(msg);
         }
 
         private void StockOut()
@@ -89,11 +90,12 @@ namespace InventoryManagementSystem.ConsoleUI
             string pid = ConsoleHelper.AskRequired("Product ID");
             string wid = ConsoleHelper.AskRequired("Warehouse ID");
             decimal qty = ConsoleHelper.AskDecimal("Quantity");
-            string ref_ = ConsoleHelper.AskInput("Reference (Invoice number, etc.)");
 
-            var (ok, msg) = _service.StockOut(pid, wid, qty, ref_);
+            if (qty <= 0) { ConsoleHelper.PrintError("Quantity must be greater than zero."); return; }
+
+            var (ok, msg) = _service.StockOut(pid, wid, qty);
             if (ok) ConsoleHelper.PrintSuccess(msg);
-            else    ConsoleHelper.PrintError(msg);
+            else ConsoleHelper.PrintError(msg);
         }
 
         private void Transfer()
@@ -103,12 +105,14 @@ namespace InventoryManagementSystem.ConsoleUI
 
             string pid = ConsoleHelper.AskRequired("Product ID");
             string from = ConsoleHelper.AskRequired("From Warehouse ID");
-            string to   = ConsoleHelper.AskRequired("To Warehouse ID");
+            string to = ConsoleHelper.AskRequired("To Warehouse ID");
             decimal qty = ConsoleHelper.AskDecimal("Quantity");
+
+            if (qty <= 0) { ConsoleHelper.PrintError("Quantity must be greater than zero."); return; }
 
             var (ok, msg) = _service.Transfer(pid, from, to, qty);
             if (ok) ConsoleHelper.PrintSuccess(msg);
-            else    ConsoleHelper.PrintError(msg);
+            else ConsoleHelper.PrintError(msg);
         }
 
         private void Hold()
@@ -119,11 +123,12 @@ namespace InventoryManagementSystem.ConsoleUI
             string pid = ConsoleHelper.AskRequired("Product ID");
             string wid = ConsoleHelper.AskRequired("Warehouse ID");
             decimal qty = ConsoleHelper.AskDecimal("Quantity to Hold");
-            string ref_ = ConsoleHelper.AskInput("Reference (Quotation number, etc.)");
 
-            var (ok, msg) = _service.HoldStock(pid, wid, qty, ref_);
+            if (qty <= 0) { ConsoleHelper.PrintError("Quantity must be greater than zero."); return; }
+
+            var (ok, msg) = _service.HoldStock(pid, wid, qty);
             if (ok) ConsoleHelper.PrintSuccess(msg);
-            else    ConsoleHelper.PrintError(msg);
+            else ConsoleHelper.PrintError(msg);
         }
 
         private void Adjustment()
@@ -135,11 +140,13 @@ namespace InventoryManagementSystem.ConsoleUI
             string pid = ConsoleHelper.AskRequired("Product ID");
             string wid = ConsoleHelper.AskRequired("Warehouse ID");
             decimal qty = ConsoleHelper.AskDecimal("Adjustment Quantity (e.g. -10 or +5)");
-            string reason = ConsoleHelper.AskInput("Reason");
+            string reason = ConsoleHelper.AskInput("Reason (optional)");
 
-            var (ok, msg) = _service.Adjustment(pid, wid, qty, reason);
+            string? reasonOrNull = string.IsNullOrWhiteSpace(reason) ? null : reason;
+
+            var (ok, msg) = _service.Adjustment(pid, wid, qty, reasonOrNull);
             if (ok) ConsoleHelper.PrintSuccess(msg);
-            else    ConsoleHelper.PrintError(msg);
+            else ConsoleHelper.PrintError(msg);
         }
 
         private void ViewHistory()
@@ -189,7 +196,7 @@ namespace InventoryManagementSystem.ConsoleUI
 
         private void ShowProductsAndWarehouses()
         {
-            var products   = _productRepo.GetAll();
+            var products = _productRepo.GetAll();
             var warehouses = _warehouseRepo.GetAll();
 
             ConsoleHelper.PrintSectionTitle("Products");

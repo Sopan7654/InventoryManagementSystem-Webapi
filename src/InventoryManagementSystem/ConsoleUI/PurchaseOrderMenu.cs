@@ -29,7 +29,7 @@ namespace InventoryManagementSystem.ConsoleUI
                     case "2": CreatePO(); break;
                     case "3": ReceivePO(); break;
                     case "0": return;
-                    default:  ConsoleHelper.PrintError("Invalid option."); break;
+                    default: ConsoleHelper.PrintError("Invalid option."); break;
                 }
                 ConsoleHelper.PressEnterToContinue();
             }
@@ -41,13 +41,17 @@ namespace InventoryManagementSystem.ConsoleUI
             var pos = _repo.GetAll();
             var rows = pos.Select(po => new[]
             {
-                po.PurchaseOrderId, po.SupplierName,
-                po.OrderDate.ToString("dd-MM-yyyy"), po.Status
+                po.PurchaseOrderId,
+                po.SupplierName,
+                po.OrderDate.ToString("dd-MM-yyyy"),
+                po.ItemCount.ToString(),
+                po.TotalAmount.ToString("N2"),
+                po.Status
             }).ToList();
 
             ConsoleHelper.PrintTable(
-                new[] { "PO ID", "Supplier", "Order Date", "Status" },
-                new[] { 12, 26, 14, 12 },
+                new[] { "PO ID", "Supplier", "Order Date", "Items", "Total Amount", "Status" },
+                new[] { 24, 20, 12, 6, 14, 12 },
                 rows
             );
         }
@@ -62,14 +66,14 @@ namespace InventoryManagementSystem.ConsoleUI
                 Console.WriteLine($"  {s.SupplierId,-6} {s.SupplierName}");
 
             string poId = "PO-" + DateTime.Now.ToString("yyyyMMddHHmmss");
-            string sid  = ConsoleHelper.AskRequired("Supplier ID");
+            string sid = ConsoleHelper.AskRequired("Supplier ID");
 
             var po = new PurchaseOrder
             {
                 PurchaseOrderId = poId,
-                SupplierId      = sid,
-                OrderDate       = DateTime.Today,
-                Status          = "PENDING"
+                SupplierId = sid,
+                OrderDate = DateTime.Today,
+                Status = "PENDING"
             };
             _repo.InsertPO(po);
 
@@ -87,17 +91,17 @@ namespace InventoryManagementSystem.ConsoleUI
 
                 var item = new PurchaseOrderItem
                 {
-                    POItemId        = $"{poId}-I{i}",
+                    POItemId = $"{poId}-I{i}",
                     PurchaseOrderId = poId,
-                    ProductId       = pid,
+                    ProductId = pid,
                     QuantityOrdered = ConsoleHelper.AskDecimal("  Quantity"),
-                    UnitPrice       = ConsoleHelper.AskDecimal("  Unit Price")
+                    UnitPrice = ConsoleHelper.AskDecimal("  Unit Price")
                 };
                 _repo.InsertItem(item);
                 i++;
             }
 
-            ConsoleHelper.PrintSuccess($"Purchase Order {poId} created with {i-1} item(s).");
+            ConsoleHelper.PrintSuccess($"Purchase Order {poId} created with {i - 1} item(s).");
         }
 
         private void ReceivePO()
@@ -112,7 +116,7 @@ namespace InventoryManagementSystem.ConsoleUI
 
             foreach (var item in items)
             {
-                var (ok, msg) = _inventoryService.StockIn(item.ProductId, wid, item.QuantityOrdered, poId);
+                var (ok, msg) = _inventoryService.StockIn(item.ProductId, wid, item.QuantityOrdered);
                 Console.WriteLine($"  {item.ProductName}: {(ok ? "" : "FAILED - ")}{msg}");
             }
 

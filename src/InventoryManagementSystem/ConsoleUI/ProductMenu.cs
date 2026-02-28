@@ -15,7 +15,7 @@ namespace InventoryManagementSystem.ConsoleUI
             {
                 ConsoleHelper.PrintHeader("Product Management");
                 Console.WriteLine("  1. View All Products");
-                Console.WriteLine("  2. Search by SKU");
+                Console.WriteLine("  2. Search by ID");
                 Console.WriteLine("  3. Add New Product");
                 Console.WriteLine("  4. Edit Product");
                 Console.WriteLine("  5. Toggle Active/Inactive");
@@ -25,7 +25,7 @@ namespace InventoryManagementSystem.ConsoleUI
                 switch (choice)
                 {
                     case "1": ViewAll(); break;
-                    case "2": SearchBySKU(); break;
+                    case "2": SearchById(); break;
                     case "3": AddProduct(); break;
                     case "4": EditProduct(); break;
                     case "5": ToggleStatus(); break;
@@ -54,10 +54,10 @@ namespace InventoryManagementSystem.ConsoleUI
             );
         }
 
-        private void SearchBySKU()
+        private void SearchById()
         {
-            string sku = ConsoleHelper.AskRequired("Enter SKU");
-            var p = _repo.GetBySKU(sku);
+            string id = ConsoleHelper.AskRequired("Enter Product ID");
+            var p = _repo.GetById(id);
             if (p == null) { ConsoleHelper.PrintError("Product not found."); return; }
 
             ConsoleHelper.PrintSectionTitle("Product Details");
@@ -81,14 +81,16 @@ namespace InventoryManagementSystem.ConsoleUI
             string sku  = ConsoleHelper.AskRequired("SKU");
             if (_repo.SKUExists(sku)) { ConsoleHelper.PrintError("SKU already exists."); return; }
 
+            string catInput = ConsoleHelper.AskInput("Category ID (optional)");
+
             var p = new Product
             {
                 ProductId     = id,
                 SKU           = sku,
                 ProductName   = ConsoleHelper.AskRequired("Product Name"),
-                Description   = ConsoleHelper.AskInput("Description (optional)"),
-                CategoryId    = ConsoleHelper.AskInput("Category ID (optional)"),
-                UnitOfMeasure = ConsoleHelper.AskInput("Unit of Measure [PCS]").DefaultIfEmpty("PCS"),
+                Description   = ConsoleHelper.AskInput("Description (optional)").NullIfEmpty(),
+                CategoryId    = string.IsNullOrWhiteSpace(catInput) ? null : catInput,
+                UnitOfMeasure = ConsoleHelper.AskInput("Unit of Measure (optional, default: PCS)").DefaultIfEmpty("PCS"),
                 Cost          = ConsoleHelper.AskDecimal("Cost Price"),
                 ListPrice     = ConsoleHelper.AskDecimal("List/Selling Price"),
                 IsActive      = true
@@ -146,6 +148,7 @@ namespace InventoryManagementSystem.ConsoleUI
 
     public static class StringExtensions
     {
-        public static string DefaultIfEmpty(this string s, string def) => string.IsNullOrWhiteSpace(s) ? def : s;
+        public static string  DefaultIfEmpty(this string s, string def) => string.IsNullOrWhiteSpace(s) ? def : s;
+        public static string? NullIfEmpty   (this string s)             => string.IsNullOrWhiteSpace(s) ? null : s;
     }
 }
