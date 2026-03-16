@@ -1,115 +1,114 @@
-﻿// Program.cs — Main entry point
-using InventoryManagementSystem.ConsoleUI;
-using InventoryManagementSystem.DataAccess;
+// Program.cs — Full DI registration for all enterprise patterns
+using FluentValidation;
+using InventoryManagementSystem.Common.Behaviors;
+using InventoryManagementSystem.Common.Interfaces;
+using InventoryManagementSystem.Common.Persistence;
+using InventoryManagementSystem.Features.Batches.Repository;
+using InventoryManagementSystem.Features.Categories.Repository;
+using InventoryManagementSystem.Features.Inventory.Repository;
+using InventoryManagementSystem.Features.Products.Repository;
+using InventoryManagementSystem.Features.PurchaseOrders.Repository;
+using InventoryManagementSystem.Features.Suppliers.Repository;
+using InventoryManagementSystem.Features.Warehouses.Repository;
+using InventoryManagementSystem.Infrastructure.Middleware;
+using MediatR;
 
-namespace InventoryManagementSystem
+var builder = WebApplication.CreateBuilder(args);
+
+// ─── Controllers ──────────────────────────────────────────────────────────────
+builder.Services.AddControllers();
+
+// ─── Swagger / OpenAPI ────────────────────────────────────────────────────────
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
 {
-    class Program
+    c.SwaggerDoc("v1", new()
     {
-        static void Main(string[] args)
-        {
-            Console.OutputEncoding = System.Text.Encoding.UTF8;
-            Console.Title = "Inventory Management System";
+        Title       = "📦 Inventory Management System API",
+        Version     = "v1",
+        Description = "Enterprise .NET 8 Web API — CQRS · MediatR · DDD · Repository · UoW · Factory · Singleton · Chain of Responsibility"
+    });
+    c.EnableAnnotations();
+});
 
-            // Initialize DB connection
-            try
-            {
-                DatabaseHelper.Initialize();
-            }
-            catch
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("\n  Failed to load configuration. Please check appsettings.json.");
-                Console.ResetColor();
-                Console.ReadLine();
-                return;
-            }
+// ─── CORS ─────────────────────────────────────────────────────────────────────
+builder.Services.AddCors(o => o.AddDefaultPolicy(p =>
+    p.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
 
-            // Test connection
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("\n  Connecting to database...");
-            Console.ResetColor();
+// ─── Factory + Singleton Pattern ──────────────────────────────────────────────
+// DbConnectionFactory is Singleton: IConfiguration is resolved ONCE at startup,
+// CreateConnection() produces a new MySqlConnection on every call (Factory Pattern).
+builder.Services.AddSingleton<IDbConnectionFactory, DbConnectionFactory>();
 
-            if (!DatabaseHelper.TestConnection())
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine(@"
-  =====================================================
-   ERROR: Cannot connect to MySQL database!
-  =====================================================
-   Please check:
-   1. MySQL server is running
-   2. appsettings.json has correct host/port/user/password
-   3. Database 'InventoryManagementDB' exists
-  =====================================================");
-                Console.ResetColor();
-                Console.ReadLine();
-                return;
-            }
+// ─── Unit of Work Pattern ─────────────────────────────────────────────────────
+// Scoped: one UnitOfWork per HTTP request so Inventory command handlers share
+// a single connection + transaction within a request.
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("  Connected successfully!\n");
-            Console.ResetColor();
-            System.Threading.Thread.Sleep(800);
+// ─── Repository Pattern (feature repositories) ────────────────────────────────
+builder.Services.AddScoped<IProductRepository,      ProductRepository>();
+builder.Services.AddScoped<ISupplierRepository,     SupplierRepository>();
+builder.Services.AddScoped<IWarehouseRepository,    WarehouseRepository>();
+builder.Services.AddScoped<ICategoryRepository,     CategoryRepository>();
+builder.Services.AddScoped<IBatchRepository,        BatchRepository>();
+builder.Services.AddScoped<IStockLevelRepository,   StockLevelRepository>();
+builder.Services.AddScoped<IStockTransactionRepository, StockTransactionRepository>();
+builder.Services.AddScoped<IPurchaseOrderRepository,    PurchaseOrderRepository>();
 
-            // Show Main Menu
-            ShowMainMenu();
-        }
+// ─── MediatR + CQRS ───────────────────────────────────────────────────────────
+// Registers all IRequestHandler<,> from this assembly automatically.
+builder.Services.AddMediatR(cfg =>
+    cfg.RegisterServicesFromAssemblyContaining<Program>());
 
-        static void ShowMainMenu()
-        {
-            var productMenu = new ProductMenu();
-            var inventoryMenu = new InventoryMenu();
-            var reportMenu = new ReportMenu();
-            var supplierMenu = new SupplierMenu();
-            var warehouseMenu = new WarehouseMenu();
-            var poMenu = new PurchaseOrderMenu();
+// ─── Chain of Responsibility: MediatR Pipeline Behaviors ──────────────────────
+// Order matters — registered behaviours wrap the handler in this sequence:
+//   LoggingBehavior → ValidationBehavior → ExceptionHandlingBehavior → Handler
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ExceptionHandlingBehavior<,>));
 
-            while (true)
-            {
-                Console.Clear();
-                Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.WriteLine(@"
-  ╔══════════════════════════════════════════════════════════════╗
-  ║          INVENTORY MANAGEMENT SYSTEM  v1.0                   ║
-  ╚══════════════════════════════════════════════════════════════╝");
-                Console.ResetColor();
+// ─── FluentValidation ─────────────────────────────────────────────────────────
+// Scans the assembly for all AbstractValidator<T> implementations.
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
-                Console.WriteLine("  1.  Product Management");
-                Console.WriteLine("  2.  Inventory Operations  (Stock In/Out/Transfer/Hold)");
-                Console.WriteLine("  3.  Purchase Orders");
-                Console.WriteLine("  4.  Supplier Management");
-                Console.WriteLine("  5.  Warehouse Management  (+ Batch Tracking)");
-                Console.WriteLine("  6.  Reports & Alerts");
-                Console.WriteLine();
-                Console.ForegroundColor = ConsoleColor.DarkGray;
-                Console.WriteLine("  0.  Exit");
-                Console.ResetColor();
+// ─── Logging ──────────────────────────────────────────────────────────────────
+builder.Services.AddLogging();
 
-                Console.Write("\n  Select option: ");
-                string choice = Console.ReadLine()?.Trim() ?? "";
+var app = builder.Build();
 
-                switch (choice)
-                {
-                    case "1": productMenu.Show(); break;
-                    case "2": inventoryMenu.Show(); break;
-                    case "3": poMenu.Show(); break;
-                    case "4": supplierMenu.Show(); break;
-                    case "5": warehouseMenu.Show(); break;
-                    case "6": reportMenu.Show(); break;
-                    case "0":
-                        Console.ForegroundColor = ConsoleColor.Green;
-                        Console.WriteLine("\n  Goodbye!\n");
-                        Console.ResetColor();
-                        return;
-                    default:
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("  Invalid option. Try again.");
-                        Console.ResetColor();
-                        System.Threading.Thread.Sleep(500);
-                        break;
-                }
-            }
-        }
+// ─── Global Exception Middleware (first in pipeline) ──────────────────────────
+app.UseMiddleware<GlobalExceptionMiddleware>();
+
+// ─── Swagger ──────────────────────────────────────────────────────────────────
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Inventory Management System API v1");
+    c.RoutePrefix = "swagger";
+    c.DocumentTitle = "IMS Enterprise API";
+});
+
+// ─── Pipeline ─────────────────────────────────────────────────────────────────
+app.UseHttpsRedirection();
+app.UseCors();
+app.MapControllers();
+
+// ─── Health Endpoint ──────────────────────────────────────────────────────────
+app.MapGet("/health", () => Results.Ok(new
+{
+    status    = "Healthy",
+    timestamp = DateTime.UtcNow,
+    patterns  = new[]
+    {
+        "CQRS via MediatR",
+        "Repository Pattern",
+        "Unit of Work",
+        "Factory Pattern (DbConnectionFactory)",
+        "Singleton Pattern (DbConnectionFactory registered as Singleton)",
+        "Chain of Responsibility (MediatR Pipeline Behaviors)",
+        "Domain Driven Design (Domain/Entities, Domain/ValueObjects, Domain/Enumerations)",
+        "Feature-based Folder Structure"
     }
-}
+}));
+
+app.Run();

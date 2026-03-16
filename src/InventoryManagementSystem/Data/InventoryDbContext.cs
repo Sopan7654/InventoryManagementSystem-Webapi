@@ -1,5 +1,5 @@
 // Data/InventoryDbContext.cs
-using InventoryManagementSystem.Models;
+using InventoryManagementSystem.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace InventoryManagementSystem.Data
