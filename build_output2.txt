@@ -1,0 +1,21 @@
+﻿  Determining projects to restore...
+C:\Users\wwwat\Downloads\InventoryManagementSystem-main\InventoryManagementSystem-main\src\InventoryManagement.Application\InventoryManagement.Application.csproj : warning NU1903: Package 'AutoMapper' 13.0.1 has a known high severity vulnerability, https://github.com/advisories/GHSA-rvv3-g6hj-g44x [C:\Users\wwwat\Downloads\InventoryManagementSystem-main\InventoryManagementSystem-main\InventoryManagement.sln]
+  All projects are up-to-date for restore.
+C:\Users\wwwat\Downloads\InventoryManagementSystem-main\InventoryManagementSystem-main\src\InventoryManagement.Application\InventoryManagement.Application.csproj : warning NU1903: Package 'AutoMapper' 13.0.1 has a known high severity vulnerability, https://github.com/advisories/GHSA-rvv3-g6hj-g44x
+  InventoryManagement.Shared -> C:\Users\wwwat\Downloads\InventoryManagementSystem-main\InventoryManagementSystem-main\src\InventoryManagement.Shared\bin\Debug\net8.0\InventoryManagement.Shared.dll
+  InventoryManagement.Domain -> C:\Users\wwwat\Downloads\InventoryManagementSystem-main\InventoryManagementSystem-main\src\InventoryManagement.Domain\bin\Debug\net8.0\InventoryManagement.Domain.dll
+  InventoryManagement.Application -> C:\Users\wwwat\Downloads\InventoryManagementSystem-main\InventoryManagementSystem-main\src\InventoryManagement.Application\bin\Debug\net8.0\InventoryManagement.Application.dll
+  InventoryManagement.Infrastructure -> C:\Users\wwwat\Downloads\InventoryManagementSystem-main\InventoryManagementSystem-main\src\InventoryManagement.Infrastructure\bin\Debug\net8.0\InventoryManagement.Infrastructure.dll
+  InventoryManagement.UnitTests -> C:\Users\wwwat\Downloads\InventoryManagementSystem-main\InventoryManagementSystem-main\tests\InventoryManagement.UnitTests\bin\Debug\net8.0\InventoryManagement.UnitTests.dll
+  InventoryManagement.API -> C:\Users\wwwat\Downloads\InventoryManagementSystem-main\InventoryManagementSystem-main\src\InventoryManagement.API\bin\Debug\net8.0\InventoryManagement.API.dll
+C:\Users\wwwat\Downloads\InventoryManagementSystem-main\InventoryManagementSystem-main\tests\InventoryManagement.IntegrationTests\Controllers\ProductsControllerTests.cs(31,28): error CS1061: 'AuthResponseDto' does not contain a definition for 'Token' and no accessible extension method 'Token' accepting a first argument of type 'AuthResponseDto' could be found (are you missing a using directive or an assembly reference?) [C:\Users\wwwat\Downloads\InventoryManagementSystem-main\InventoryManagementSystem-main\tests\InventoryManagement.IntegrationTests\InventoryManagement.IntegrationTests.csproj]
+
+Build FAILED.
+
+C:\Users\wwwat\Downloads\InventoryManagementSystem-main\InventoryManagementSystem-main\src\InventoryManagement.Application\InventoryManagement.Application.csproj : warning NU1903: Package 'AutoMapper' 13.0.1 has a known high severity vulnerability, https://github.com/advisories/GHSA-rvv3-g6hj-g44x [C:\Users\wwwat\Downloads\InventoryManagementSystem-main\InventoryManagementSystem-main\InventoryManagement.sln]
+C:\Users\wwwat\Downloads\InventoryManagementSystem-main\InventoryManagementSystem-main\src\InventoryManagement.Application\InventoryManagement.Application.csproj : warning NU1903: Package 'AutoMapper' 13.0.1 has a known high severity vulnerability, https://github.com/advisories/GHSA-rvv3-g6hj-g44x
+C:\Users\wwwat\Downloads\InventoryManagementSystem-main\InventoryManagementSystem-main\tests\InventoryManagement.IntegrationTests\Controllers\ProductsControllerTests.cs(31,28): error CS1061: 'AuthResponseDto' does not contain a definition for 'Token' and no accessible extension method 'Token' accepting a first argument of type 'AuthResponseDto' could be found (are you missing a using directive or an assembly reference?) [C:\Users\wwwat\Downloads\InventoryManagementSystem-main\InventoryManagementSystem-main\tests\InventoryManagement.IntegrationTests\InventoryManagement.IntegrationTests.csproj]
+    2 Warning(s)
+    1 Error(s)
+
+Time Elapsed 00:00:01.93

@@ -1,0 +1,18 @@
+﻿  Determining projects to restore...
+C:\Users\wwwat\Downloads\InventoryManagementSystem-main\InventoryManagementSystem-main\src\InventoryManagement.Application\InventoryManagement.Application.csproj : warning NU1903: Package 'AutoMapper' 13.0.1 has a known high severity vulnerability, https://github.com/advisories/GHSA-rvv3-g6hj-g44x [C:\Users\wwwat\Downloads\InventoryManagementSystem-main\InventoryManagementSystem-main\InventoryManagement.sln]
+  All projects are up-to-date for restore.
+C:\Users\wwwat\Downloads\InventoryManagementSystem-main\InventoryManagementSystem-main\src\InventoryManagement.Application\InventoryManagement.Application.csproj : warning NU1903: Package 'AutoMapper' 13.0.1 has a known high severity vulnerability, https://github.com/advisories/GHSA-rvv3-g6hj-g44x
+  InventoryManagement.Domain -> C:\Users\wwwat\Downloads\InventoryManagementSystem-main\InventoryManagementSystem-main\src\InventoryManagement.Domain\bin\Debug\net8.0\InventoryManagement.Domain.dll
+  InventoryManagement.Shared -> C:\Users\wwwat\Downloads\InventoryManagementSystem-main\InventoryManagementSystem-main\src\InventoryManagement.Shared\bin\Debug\net8.0\InventoryManagement.Shared.dll
+  InventoryManagement.Application -> C:\Users\wwwat\Downloads\InventoryManagementSystem-main\InventoryManagementSystem-main\src\InventoryManagement.Application\bin\Debug\net8.0\InventoryManagement.Application.dll
+  InventoryManagement.Infrastructure -> C:\Users\wwwat\Downloads\InventoryManagementSystem-main\InventoryManagementSystem-main\src\InventoryManagement.Infrastructure\bin\Debug\net8.0\InventoryManagement.Infrastructure.dll
+  InventoryManagement.UnitTests -> C:\Users\wwwat\Downloads\InventoryManagementSystem-main\InventoryManagementSystem-main\tests\InventoryManagement.UnitTests\bin\Debug\net8.0\InventoryManagement.UnitTests.dll
+Test run for C:\Users\wwwat\Downloads\InventoryManagementSystem-main\InventoryManagementSystem-main\tests\InventoryManagement.UnitTests\bin\Debug\net8.0\InventoryManagement.UnitTests.dll (.NETCoreApp,Version=v8.0)
+  InventoryManagement.API -> C:\Users\wwwat\Downloads\InventoryManagementSystem-main\InventoryManagementSystem-main\src\InventoryManagement.API\bin\Debug\net8.0\InventoryManagement.API.dll
+VSTest version 17.11.1 (x64)
+
+Starting test execution, please wait...
+A total of 1 test files matched the specified pattern.
+C:\Users\wwwat\Downloads\InventoryManagementSystem-main\InventoryManagementSystem-main\tests\InventoryManagement.IntegrationTests\Infrastructure\InventoryApiFactory.cs(20,24): error CS1061: 'IConfigurationBuilder' does not contain a definition for 'AddInMemoryCollection' and no accessible extension method 'AddInMemoryCollection' accepting a first argument of type 'IConfigurationBuilder' could be found (are you missing a using directive or an assembly reference?) [C:\Users\wwwat\Downloads\InventoryManagementSystem-main\InventoryManagementSystem-main\tests\InventoryManagement.IntegrationTests\InventoryManagement.IntegrationTests.csproj]
+
+Passed!  - Failed:     0, Passed:     5, Skipped:     0, Total:     5, Duration: 25 ms - InventoryManagement.UnitTests.dll (net8.0)

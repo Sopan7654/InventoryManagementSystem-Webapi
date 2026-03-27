@@ -1,0 +1,39 @@
+﻿  Determining projects to restore...
+C:\Users\wwwat\Downloads\InventoryManagementSystem-main\InventoryManagementSystem-main\src\InventoryManagement.Application\InventoryManagement.Application.csproj : warning NU1903: Package 'AutoMapper' 13.0.1 has a known high severity vulnerability, https://github.com/advisories/GHSA-rvv3-g6hj-g44x [C:\Users\wwwat\Downloads\InventoryManagementSystem-main\InventoryManagementSystem-main\InventoryManagement.sln]
+  All projects are up-to-date for restore.
+C:\Users\wwwat\Downloads\InventoryManagementSystem-main\InventoryManagementSystem-main\src\InventoryManagement.Application\InventoryManagement.Application.csproj : warning NU1903: Package 'AutoMapper' 13.0.1 has a known high severity vulnerability, https://github.com/advisories/GHSA-rvv3-g6hj-g44x
+  InventoryManagement.Shared -> C:\Users\wwwat\Downloads\InventoryManagementSystem-main\InventoryManagementSystem-main\src\InventoryManagement.Shared\bin\Debug\net8.0\InventoryManagement.Shared.dll
+  InventoryManagement.Domain -> C:\Users\wwwat\Downloads\InventoryManagementSystem-main\InventoryManagementSystem-main\src\InventoryManagement.Domain\bin\Debug\net8.0\InventoryManagement.Domain.dll
+  InventoryManagement.Application -> C:\Users\wwwat\Downloads\InventoryManagementSystem-main\InventoryManagementSystem-main\src\InventoryManagement.Application\bin\Debug\net8.0\InventoryManagement.Application.dll
+  InventoryManagement.Infrastructure -> C:\Users\wwwat\Downloads\InventoryManagementSystem-main\InventoryManagementSystem-main\src\InventoryManagement.Infrastructure\bin\Debug\net8.0\InventoryManagement.Infrastructure.dll
+  InventoryManagement.UnitTests -> C:\Users\wwwat\Downloads\InventoryManagementSystem-main\InventoryManagementSystem-main\tests\InventoryManagement.UnitTests\bin\Debug\net8.0\InventoryManagement.UnitTests.dll
+Test run for C:\Users\wwwat\Downloads\InventoryManagementSystem-main\InventoryManagementSystem-main\tests\InventoryManagement.UnitTests\bin\Debug\net8.0\InventoryManagement.UnitTests.dll (.NETCoreApp,Version=v8.0)
+  InventoryManagement.API -> C:\Users\wwwat\Downloads\InventoryManagementSystem-main\InventoryManagementSystem-main\src\InventoryManagement.API\bin\Debug\net8.0\InventoryManagement.API.dll
+VSTest version 17.11.1 (x64)
+
+Starting test execution, please wait...
+A total of 1 test files matched the specified pattern.
+  InventoryManagement.IntegrationTests -> C:\Users\wwwat\Downloads\InventoryManagementSystem-main\InventoryManagementSystem-main\tests\InventoryManagement.IntegrationTests\bin\Debug\net8.0\InventoryManagement.IntegrationTests.dll
+Test run for C:\Users\wwwat\Downloads\InventoryManagementSystem-main\InventoryManagementSystem-main\tests\InventoryManagement.IntegrationTests\bin\Debug\net8.0\InventoryManagement.IntegrationTests.dll (.NETCoreApp,Version=v8.0)
+VSTest version 17.11.1 (x64)
+
+Starting test execution, please wait...
+A total of 1 test files matched the specified pattern.
+
+Passed!  - Failed:     0, Passed:     5, Skipped:     0, Total:     5, Duration: 30 ms - InventoryManagement.UnitTests.dll (net8.0)
+  Failed InventoryManagement.IntegrationTests.Controllers.ProductsControllerTests.GetAll_WithAdminToken_ReturnsPaginatedProducts [169 ms]
+  Error Message:
+   System.Exception : Login failed with status InternalServerError. Response: {"type":"ServerError","title":"An unexpected error occurred.","status":500,"detail":"Please contact support."}
+  Stack Trace:
+     at InventoryManagement.IntegrationTests.Controllers.ProductsControllerTests.GetAdminTokenAsync() in C:\Users\wwwat\Downloads\InventoryManagementSystem-main\InventoryManagementSystem-main\tests\InventoryManagement.IntegrationTests\Controllers\ProductsControllerTests.cs:line 31
+   at InventoryManagement.IntegrationTests.Controllers.ProductsControllerTests.GetAll_WithAdminToken_ReturnsPaginatedProducts() in C:\Users\wwwat\Downloads\InventoryManagementSystem-main\InventoryManagementSystem-main\tests\InventoryManagement.IntegrationTests\Controllers\ProductsControllerTests.cs:line 49
+--- End of stack trace from previous location ---
+  Failed InventoryManagement.IntegrationTests.Controllers.ProductsControllerTests.CreateProduct_ValidData_ReturnsCreatedProduct [60 ms]
+  Error Message:
+   System.Exception : Login failed with status InternalServerError. Response: {"type":"ServerError","title":"An unexpected error occurred.","status":500,"detail":"Please contact support."}
+  Stack Trace:
+     at InventoryManagement.IntegrationTests.Controllers.ProductsControllerTests.GetAdminTokenAsync() in C:\Users\wwwat\Downloads\InventoryManagementSystem-main\InventoryManagementSystem-main\tests\InventoryManagement.IntegrationTests\Controllers\ProductsControllerTests.cs:line 31
+   at InventoryManagement.IntegrationTests.Controllers.ProductsControllerTests.CreateProduct_ValidData_ReturnsCreatedProduct() in C:\Users\wwwat\Downloads\InventoryManagementSystem-main\InventoryManagementSystem-main\tests\InventoryManagement.IntegrationTests\Controllers\ProductsControllerTests.cs:line 67
+--- End of stack trace from previous location ---
+
+Failed!  - Failed:     2, Passed:     1, Skipped:     0, Total:     3, Duration: 236 ms - InventoryManagement.IntegrationTests.dll (net8.0)
