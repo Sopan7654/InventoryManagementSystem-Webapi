@@ -1,0 +1,12 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Namespace — isolates all IMS resources from other workloads in the cluster
+# Apply: kubectl apply -f k8s/namespace.yaml
+# ─────────────────────────────────────────────────────────────────────────────
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: inventory-system
+  labels:
+    app.kubernetes.io/name: inventory-management-system
+    app.kubernetes.io/version: "1.0.0"
+    managed-by: kubectl

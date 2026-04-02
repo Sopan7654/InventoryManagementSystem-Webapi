@@ -64,6 +64,26 @@ namespace InventoryManagementSystem.Features.Inventory.Repository
             return list;
         }
 
+        /// <summary>Returns all StockLevel rows for a given product across all warehouses.</summary>
+        public async Task<List<StockLevel>> GetByProductAsync(string productId, CancellationToken ct = default)
+        {
+            var list = new List<StockLevel>();
+            await using var conn = _factory.CreateConnection();
+            await conn.OpenAsync(ct);
+            const string sql = @"SELECT sl.StockLevelId,sl.ProductId,p.ProductName,sl.WarehouseId,w.WarehouseName,
+                                        sl.QuantityOnHand,sl.ReorderLevel,sl.SafetyStock,sl.ReservedQuantity
+                                 FROM StockLevel sl
+                                 JOIN Product p ON p.ProductId=sl.ProductId
+                                 JOIN Warehouse w ON w.WarehouseId=sl.WarehouseId
+                                 WHERE sl.ProductId=@pid
+                                 ORDER BY w.WarehouseName";
+            await using var cmd = new MySqlCommand(sql, conn);
+            cmd.Parameters.AddWithValue("@pid", productId);
+            await using var rdr = await cmd.ExecuteReaderAsync(ct);
+            while (await rdr.ReadAsync(ct)) list.Add(Map(rdr));
+            return list;
+        }
+
         // Unit of Work overloads — share the caller's connection + transaction
         public async Task UpsertAsync(string productId, string warehouseId, decimal qtyDelta,
             MySqlConnection conn, MySqlTransaction txn, CancellationToken ct = default)
@@ -114,7 +134,7 @@ namespace InventoryManagementSystem.Features.Inventory.Repository
             await cmd.ExecuteNonQueryAsync(ct);
         }
 
-        private static StockLevel Map(MySqlDataReader r) => new()
+        private static StockLevel Map(System.Data.Common.DbDataReader r) => new()
         {
             StockLevelId     = r["StockLevelId"].ToString()!,
             ProductId        = r["ProductId"].ToString()!,

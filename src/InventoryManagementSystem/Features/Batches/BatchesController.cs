@@ -1,11 +1,14 @@
 // Features/Batches/BatchesController.cs
-using MediatR; using Microsoft.AspNetCore.Mvc;
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
 using InventoryManagementSystem.Features.Batches.Commands.CreateBatch;
 using InventoryManagementSystem.Features.Batches.Queries.GetAllBatches;
 using InventoryManagementSystem.Features.Batches.Queries.GetExpiringBatches;
 namespace InventoryManagementSystem.Features.Batches
 {
-    [ApiController][Route("api/[controller]")][Produces("application/json")]
+    [ApiController]
+    [Route("api/[controller]")]
+    [Produces("application/json")]
     public sealed class BatchesController : ControllerBase
     {
         private readonly IMediator _mediator;

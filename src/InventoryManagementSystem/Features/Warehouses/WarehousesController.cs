@@ -1,6 +1,7 @@
 // Features/Warehouses/WarehousesController.cs
 using MediatR; using Microsoft.AspNetCore.Mvc;
 using InventoryManagementSystem.Features.Warehouses.Commands.CreateWarehouse;
+using InventoryManagementSystem.Features.Warehouses.Commands.UpdateWarehouse;
 using InventoryManagementSystem.Features.Warehouses.Queries.GetAllWarehouses;
 using InventoryManagementSystem.Features.Warehouses.Queries.GetWarehouseById;
 namespace InventoryManagementSystem.Features.Warehouses
@@ -24,6 +25,15 @@ namespace InventoryManagementSystem.Features.Warehouses
         {
             var result = await _mediator.Send(cmd, ct);
             return CreatedAtAction(nameof(GetById), new { id = result.Value }, new { success = true, warehouseId = result.Value });
+        }
+
+        /// <summary>Update an existing warehouse's details.</summary>
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(string id, [FromBody] UpdateWarehouseCommand cmd, CancellationToken ct)
+        {
+            var updatedCmd = cmd with { WarehouseId = id };
+            var result = await _mediator.Send(updatedCmd, ct);
+            return Ok(new { success = true, message = result.Value });
         }
     }
 }

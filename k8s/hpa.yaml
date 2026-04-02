@@ -1,0 +1,56 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# HorizontalPodAutoscaler — auto-scale the API based on CPU & memory usage
+#
+# Prerequisites:
+#   Metrics Server must be installed:
+#     kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+#
+#   For minikube:
+#     minikube addons enable metrics-server
+#
+# Apply: kubectl apply -f k8s/hpa.yaml
+# View:  kubectl get hpa -n inventory-system
+# ─────────────────────────────────────────────────────────────────────────────
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: api-hpa
+  namespace: inventory-system
+  labels:
+    app: api
+    app.kubernetes.io/component: backend
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: api
+  minReplicas: 2          # Always run at least 2 for HA
+  maxReplicas: 5          # Scale up to 5 replicas under heavy load
+  metrics:
+    # ── Scale on CPU utilization ─────────────────────────────────────────────
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70    # Scale up when avg CPU > 70%
+    # ── Scale on Memory utilization ──────────────────────────────────────────
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80    # Scale up when avg Memory > 80%
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 60    # Wait 60s before scaling up again
+      policies:
+        - type: Pods
+          value: 1
+          periodSeconds: 60
+    scaleDown:
+      stabilizationWindowSeconds: 300   # Wait 5min before scaling down
+      policies:
+        - type: Pods
+          value: 1
+          periodSeconds: 120

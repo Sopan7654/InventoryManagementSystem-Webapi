@@ -1,0 +1,89 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# React Frontend Deployment + ClusterIP Service
+#
+# Prerequisites:
+#   1. Build & push image:
+#      docker build -t inventory-management-frontend:latest ./inventory-frontend
+#      (For minikube: eval $(minikube docker-env) before building)
+#
+# Apply: kubectl apply -f k8s/frontend-deployment.yaml
+# ─────────────────────────────────────────────────────────────────────────────
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: inventory-system
+  labels:
+    app: frontend
+    app.kubernetes.io/component: frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: frontend
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0               # Zero-downtime deployments
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: inventory-management-frontend:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          # ── Liveness probe ────────────────────────────────────────────────────
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 3
+          # ── Readiness probe ───────────────────────────────────────────────────
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          # ── Resource limits ───────────────────────────────────────────────────
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+
+---
+# ─────────────────────────────────────────────────────────────────────────────
+# ClusterIP Service — internal DNS: frontend.inventory-system.svc.cluster.local
+# ─────────────────────────────────────────────────────────────────────────────
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  namespace: inventory-system
+  labels:
+    app: frontend
+    app.kubernetes.io/component: frontend
+spec:
+  selector:
+    app: frontend
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+      protocol: TCP
+  type: ClusterIP

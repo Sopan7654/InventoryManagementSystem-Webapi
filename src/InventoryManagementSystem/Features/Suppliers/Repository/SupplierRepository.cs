@@ -1,4 +1,5 @@
 // Features/Suppliers/Repository/SupplierRepository.cs
+using System.Data.Common;
 using MySql.Data.MySqlClient;
 using InventoryManagementSystem.Common.Interfaces;
 using InventoryManagementSystem.Domain.Entities;
@@ -61,7 +62,7 @@ namespace InventoryManagementSystem.Features.Suppliers.Repository
             return await cmd.ExecuteNonQueryAsync(ct) > 0;
         }
 
-        private static Supplier Map(MySqlDataReader r) => new()
+        private static Supplier Map(DbDataReader r) => new()
         {
             SupplierId   = r["SupplierId"].ToString()!,
             SupplierName = r["SupplierName"].ToString()!,

@@ -1,0 +1,38 @@
+# .dockerignore — Exclude files from the Docker build context
+# This dramatically reduces build time and image size
+
+# ── Git ──────────────────────────────────────────────────────────────────────
+.git
+.gitignore
+.gitattributes
+
+# ── IDE / Editor ─────────────────────────────────────────────────────────────
+.vs
+.vscode
+*.user
+*.suo
+*.userprefs
+
+# ── Build outputs ─────────────────────────────────────────────────────────────
+**/bin/
+**/obj/
+
+# ── Frontend (built separately in its own Dockerfile) ───────────────────────
+inventory-frontend/
+
+# ── Tests (not needed in the production API image) ──────────────────────────
+tests/
+
+# ── Docker files themselves ───────────────────────────────────────────────────
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# ── Kubernetes manifests ──────────────────────────────────────────────────────
+k8s/
+
+# ── Documentation ─────────────────────────────────────────────────────────────
+README.md
+architecture.html
+*.md
+*.html

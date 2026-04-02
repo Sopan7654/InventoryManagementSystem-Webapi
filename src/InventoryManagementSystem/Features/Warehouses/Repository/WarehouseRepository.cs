@@ -43,7 +43,23 @@ namespace InventoryManagementSystem.Features.Warehouses.Repository
             await cmd.ExecuteNonQueryAsync(ct);
         }
 
-        private static Warehouse Map(MySqlDataReader r) => new()
+        public async Task<bool> UpdateAsync(Warehouse w, CancellationToken ct = default)
+        {
+            await using var conn = _factory.CreateConnection();
+            await conn.OpenAsync(ct);
+            const string sql = @"UPDATE Warehouse
+                                 SET WarehouseName=@name, Location=@loc, Capacity=@cap
+                                 WHERE WarehouseId=@id";
+            await using var cmd = new MySqlCommand(sql, conn);
+            cmd.Parameters.AddWithValue("@name", w.WarehouseName);
+            cmd.Parameters.AddWithValue("@loc",  w.Location ?? (object)DBNull.Value);
+            cmd.Parameters.AddWithValue("@cap",  w.Capacity.HasValue ? w.Capacity.Value : (object)DBNull.Value);
+            cmd.Parameters.AddWithValue("@id",   w.WarehouseId);
+            var rows = await cmd.ExecuteNonQueryAsync(ct);
+            return rows > 0;
+        }
+
+        private static Warehouse Map(System.Data.Common.DbDataReader r) => new()
         {
             WarehouseId   = r["WarehouseId"].ToString()!,
             WarehouseName = r["WarehouseName"].ToString()!,

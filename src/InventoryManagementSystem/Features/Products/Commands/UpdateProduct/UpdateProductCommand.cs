@@ -5,7 +5,6 @@ using InventoryManagementSystem.Common.Models;
 namespace InventoryManagementSystem.Features.Products.Commands.UpdateProduct
 {
     public sealed record UpdateProductCommand(
-        string ProductId,
         string SKU,
         string ProductName,
         string? Description,
@@ -13,6 +12,7 @@ namespace InventoryManagementSystem.Features.Products.Commands.UpdateProduct
         string UnitOfMeasure,
         decimal Cost,
         decimal ListPrice,
-        bool IsActive
+        bool IsActive,
+        string ProductId = ""
     ) : IRequest<Result<bool>>;
 }

@@ -53,7 +53,23 @@ namespace InventoryManagementSystem.Features.Categories.Repository
             await cmd.ExecuteNonQueryAsync(ct);
         }
 
-        private static ProductCategory Map(MySqlDataReader r) => new()
+        public async Task<bool> UpdateAsync(ProductCategory c, CancellationToken ct = default)
+        {
+            await using var conn = _factory.CreateConnection();
+            await conn.OpenAsync(ct);
+            const string sql = @"UPDATE ProductCategory
+                                 SET CategoryName=@name, Description=@desc, ParentCategoryId=@parent
+                                 WHERE CategoryId=@id";
+            await using var cmd = new MySqlCommand(sql, conn);
+            cmd.Parameters.AddWithValue("@name",   c.CategoryName);
+            cmd.Parameters.AddWithValue("@desc",   c.Description      ?? (object)DBNull.Value);
+            cmd.Parameters.AddWithValue("@parent", c.ParentCategoryId ?? (object)DBNull.Value);
+            cmd.Parameters.AddWithValue("@id",     c.CategoryId);
+            var rows = await cmd.ExecuteNonQueryAsync(ct);
+            return rows > 0;
+        }
+
+        private static ProductCategory Map(System.Data.Common.DbDataReader r) => new()
         {
             CategoryId         = r["CategoryId"].ToString()!,
             CategoryName       = r["CategoryName"].ToString()!,

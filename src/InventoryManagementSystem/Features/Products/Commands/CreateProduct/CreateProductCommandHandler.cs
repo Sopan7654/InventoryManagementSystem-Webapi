@@ -1,6 +1,7 @@
 // Features/Products/Commands/CreateProduct/CreateProductCommandHandler.cs
 using MediatR;
 using InventoryManagementSystem.Common.Exceptions;
+using InventoryManagementSystem.Common.Interfaces;
 using InventoryManagementSystem.Common.Models;
 using InventoryManagementSystem.Domain.Entities;
 using InventoryManagementSystem.Features.Products.Repository;
@@ -11,8 +12,13 @@ namespace InventoryManagementSystem.Features.Products.Commands.CreateProduct
         : IRequestHandler<CreateProductCommand, Result<string>>
     {
         private readonly IProductRepository _repo;
+        private readonly ICacheService _cache;
 
-        public CreateProductCommandHandler(IProductRepository repo) => _repo = repo;
+        public CreateProductCommandHandler(IProductRepository repo, ICacheService cache)
+        {
+            _repo = repo;
+            _cache = cache;
+        }
 
         public async Task<Result<string>> Handle(
             CreateProductCommand cmd, CancellationToken cancellationToken)
@@ -34,6 +40,7 @@ namespace InventoryManagementSystem.Features.Products.Commands.CreateProduct
             };
 
             await _repo.InsertAsync(product, cancellationToken);
+            await _cache.RemoveAsync("products_all", cancellationToken);
             return Result<string>.Success(product.ProductId);
         }
     }

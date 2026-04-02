@@ -1,4 +1,5 @@
 // Features/Products/Repository/ProductRepository.cs
+using System.Data.Common;
 using MySql.Data.MySqlClient;
 using InventoryManagementSystem.Common.Interfaces;
 using InventoryManagementSystem.Domain.Entities;
@@ -115,7 +116,7 @@ namespace InventoryManagementSystem.Features.Products.Repository
             return Convert.ToInt32(count) > 0;
         }
 
-        private static Product Map(MySqlDataReader r) => new()
+        private static Product Map(DbDataReader r) => new()
         {
             ProductId     = r["ProductId"].ToString()!,
             SKU           = r["SKU"].ToString()!,

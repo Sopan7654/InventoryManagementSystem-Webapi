@@ -1,0 +1,110 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# MySQL Deployment + ClusterIP Service
+#
+# Strategy: Recreate (not RollingUpdate) — MySQL cannot handle two pods writing
+# to the same volume simultaneously.
+#
+# Apply: kubectl apply -f k8s/mysql-deployment.yaml
+# ─────────────────────────────────────────────────────────────────────────────
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  namespace: inventory-system
+  labels:
+    app: mysql
+    app.kubernetes.io/component: database
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  strategy:
+    type: Recreate          # Ensures old pod is fully stopped before new one starts
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:8.0
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: mysql-root-password
+            - name: MYSQL_DATABASE
+              value: InventoryManagementDB
+            - name: MYSQL_ROOT_HOST
+              value: '%'
+          ports:
+            - name: mysql
+              containerPort: 3306
+              protocol: TCP
+          volumeMounts:
+            - name: mysql-storage
+              mountPath: /var/lib/mysql
+          # ── Liveness: restart if MySQL is completely unresponsive ────────────
+          livenessProbe:
+            exec:
+              command:
+                - mysqladmin
+                - ping
+                - -h
+                - localhost
+                - -uroot
+                - -pSopan@123
+            initialDelaySeconds: 40
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 3
+          # ── Readiness: don't send traffic until MySQL accepts connections ────
+          readinessProbe:
+            exec:
+              command:
+                - mysqladmin
+                - ping
+                - -h
+                - localhost
+                - -uroot
+                - -pSopan@123
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 5
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+      volumes:
+        - name: mysql-storage
+          persistentVolumeClaim:
+            claimName: mysql-pvc
+
+---
+# ─────────────────────────────────────────────────────────────────────────────
+# ClusterIP Service — internal DNS: mysql.inventory-system.svc.cluster.local
+# ─────────────────────────────────────────────────────────────────────────────
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+  namespace: inventory-system
+  labels:
+    app: mysql
+    app.kubernetes.io/component: database
+spec:
+  selector:
+    app: mysql
+  ports:
+    - name: mysql
+      port: 3306
+      targetPort: 3306
+      protocol: TCP
+  type: ClusterIP

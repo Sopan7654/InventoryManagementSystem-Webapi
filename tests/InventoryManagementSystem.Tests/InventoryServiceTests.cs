@@ -1,5 +1,8 @@
-// InventoryServiceTests.cs — Pure model unit tests (no live DB required)
-using InventoryManagementSystem.Models;
+// InventoryServiceTests.cs — Pure domain model unit tests (no live DB required)
+// Namespaces fixed from old console app (InventoryManagementSystem.Models)
+// to current WebAPI structure (Domain.Entities + Domain.Enumerations)
+using InventoryManagementSystem.Domain.Entities;
+using InventoryManagementSystem.Domain.Enumerations;
 using Xunit;
 
 namespace InventoryManagementSystem.Tests
@@ -53,6 +56,7 @@ namespace InventoryManagementSystem.Tests
 
     // ============================================================
     // TEST CLASS 2: Batch — Expiry Status
+    // Convention: underscore format matches Batch.ExpiryStatus property
     // ============================================================
     public class BatchModelTests
     {
@@ -60,7 +64,7 @@ namespace InventoryManagementSystem.Tests
         public void ExpiryStatus_ShouldReturnNoExpiry_WhenNoDate()
         {
             var b = new Batch { ExpiryDate = null };
-            Assert.Equal("No Expiry", b.ExpiryStatus);
+            Assert.Equal("NO_EXPIRY", b.ExpiryStatus);
         }
 
         [Fact]
@@ -74,14 +78,14 @@ namespace InventoryManagementSystem.Tests
         public void ExpiryStatus_ShouldReturnExpiringSoon_Within30Days()
         {
             var b = new Batch { ExpiryDate = DateTime.Today.AddDays(10) };
-            Assert.Equal("EXPIRING SOON", b.ExpiryStatus);
+            Assert.Equal("EXPIRING_SOON", b.ExpiryStatus);
         }
 
         [Fact]
         public void ExpiryStatus_ShouldReturnExpiringSoon_ExactlyToday()
         {
             var b = new Batch { ExpiryDate = DateTime.Today };
-            Assert.Equal("EXPIRING SOON", b.ExpiryStatus);
+            Assert.Equal("EXPIRING_SOON", b.ExpiryStatus);
         }
 
         [Fact]
@@ -114,6 +118,7 @@ namespace InventoryManagementSystem.Tests
 
     // ============================================================
     // TEST CLASS 4: PurchaseOrderItem — LineTotal
+    // PurchaseOrderItem is defined in Domain.Entities (inside PurchaseOrder.cs)
     // ============================================================
     public class PurchaseOrderItemTests
     {
@@ -133,32 +138,33 @@ namespace InventoryManagementSystem.Tests
     }
 
     // ============================================================
-    // TEST CLASS 5: TransactionTypes — Constants
+    // TEST CLASS 5: TransactionType constants (Domain.Enumerations)
+    // Class name: TransactionType (not TransactionTypes — old console app name)
     // ============================================================
     public class TransactionTypeTests
     {
         [Fact]
         public void Purchase_ShouldEqualPURCHASE()
         {
-            Assert.Equal("PURCHASE", TransactionTypes.Purchase);
+            Assert.Equal("PURCHASE", TransactionType.Purchase);
         }
 
         [Fact]
         public void Sale_ShouldEqualSALE()
         {
-            Assert.Equal("SALE", TransactionTypes.Sale);
+            Assert.Equal("SALE", TransactionType.Sale);
         }
 
         [Fact]
         public void TransferIn_ShouldEqualTRANSFER_IN()
         {
-            Assert.Equal("TRANSFER_IN", TransactionTypes.TransferIn);
+            Assert.Equal("TRANSFER_IN", TransactionType.TransferIn);
         }
 
         [Fact]
         public void Hold_ShouldEqualHOLD()
         {
-            Assert.Equal("HOLD", TransactionTypes.Hold);
+            Assert.Equal("HOLD", TransactionType.Hold);
         }
     }
 }

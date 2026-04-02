@@ -1,0 +1,69 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Nginx Ingress — single entry point routing traffic to frontend and API
+#
+# Prerequisites:
+#   Install Nginx Ingress Controller:
+#     kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.10.1/deploy/static/provider/cloud/deploy.yaml
+#
+#   For minikube:
+#     minikube addons enable ingress
+#
+#   Add to your hosts file (C:\Windows\System32\drivers\etc\hosts):
+#     127.0.0.1   inventory.local
+#
+# Apply: kubectl apply -f k8s/ingress.yaml
+# ─────────────────────────────────────────────────────────────────────────────
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ims-ingress
+  namespace: inventory-system
+  labels:
+    app.kubernetes.io/component: ingress
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "30"
+    nginx.ingress.kubernetes.io/proxy-send-timeout:    "30"
+    nginx.ingress.kubernetes.io/proxy-read-timeout:    "30"
+    nginx.ingress.kubernetes.io/proxy-body-size:       "10m"
+    # Enable CORS at Ingress level
+    nginx.ingress.kubernetes.io/enable-cors:           "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin:     "*"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: inventory.local
+      http:
+        paths:
+          # ── API routes (/api/*, /swagger/*, /health) → backend ─────────────
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: api
+                port:
+                  number: 8080
+
+          - path: /swagger
+            pathType: Prefix
+            backend:
+              service:
+                name: api
+                port:
+                  number: 8080
+
+          - path: /health
+            pathType: Prefix
+            backend:
+              service:
+                name: api
+                port:
+                  number: 8080
+
+          # ── Everything else → React frontend ──────────────────────────────
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend
+                port:
+                  number: 80

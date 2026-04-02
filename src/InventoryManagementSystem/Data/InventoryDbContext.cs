@@ -20,6 +20,7 @@ namespace InventoryManagementSystem.Data
         public DbSet<StockTransaction>  StockTransactions   { get; set; } = null!;
         public DbSet<PurchaseOrder>     PurchaseOrders      { get; set; } = null!;
         public DbSet<PurchaseOrderItem> PurchaseOrderItems  { get; set; } = null!;
+        public DbSet<ProductSupplier>   ProductSuppliers    { get; set; } = null!;
 
         public InventoryDbContext(DbContextOptions<InventoryDbContext> options)
             : base(options) { }
@@ -384,6 +385,55 @@ namespace InventoryManagementSystem.Data
                       .WithMany()
                       .HasForeignKey(e => e.ProductId)
                       .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // ── ProductSupplier ─────────────────────────────────────────────────
+            modelBuilder.Entity<ProductSupplier>(entity =>
+            {
+                entity.ToTable("ProductSupplier");
+                entity.HasKey(e => e.SupplierProductId);
+
+                entity.Property(e => e.SupplierProductId)
+                      .HasMaxLength(36)
+                      .IsRequired();
+
+                entity.Property(e => e.ProductId)
+                      .HasMaxLength(36)
+                      .IsRequired();
+
+                entity.Property(e => e.SupplierId)
+                      .HasMaxLength(36)
+                      .IsRequired();
+
+                entity.Property(e => e.SupplierSKU)
+                      .HasMaxLength(100);
+
+                entity.Property(e => e.SupplierCost)
+                      .HasColumnType("decimal(18,2)");
+
+                entity.Property(e => e.IsPreferred)
+                      .HasDefaultValue(false);
+
+                // Display-only — not DB columns
+                entity.Ignore(e => e.ProductName);
+                entity.Ignore(e => e.SupplierName);
+
+                // Unique: one row per Product+Supplier combination
+                entity.HasIndex(e => new { e.ProductId, e.SupplierId })
+                      .IsUnique()
+                      .HasDatabaseName("idx_productsupplier_product_supplier");
+
+                // FK: ProductSupplier.ProductId → Product.ProductId
+                entity.HasOne(e => e.Product)
+                      .WithMany()
+                      .HasForeignKey(e => e.ProductId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                // FK: ProductSupplier.SupplierId → Supplier.SupplierId
+                entity.HasOne(e => e.Supplier)
+                      .WithMany()
+                      .HasForeignKey(e => e.SupplierId)
+                      .OnDelete(DeleteBehavior.Cascade);
             });
         }
     }

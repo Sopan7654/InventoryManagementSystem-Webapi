@@ -58,7 +58,7 @@ namespace InventoryManagementSystem.Features.Batches.Repository
             await cmd.ExecuteNonQueryAsync(ct);
         }
 
-        private static Batch Map(MySqlDataReader r) => new()
+        private static Batch Map(System.Data.Common.DbDataReader r) => new()
         {
             BatchId           = r["BatchId"].ToString()!,
             ProductId         = r["ProductId"].ToString()!,

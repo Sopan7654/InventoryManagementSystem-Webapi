@@ -7,5 +7,6 @@ namespace InventoryManagementSystem.Features.Categories.Repository
         Task<List<ProductCategory>> GetAllAsync(CancellationToken ct = default);
         Task<ProductCategory?> GetByIdAsync(string id, CancellationToken ct = default);
         Task InsertAsync(ProductCategory category, CancellationToken ct = default);
+        Task<bool> UpdateAsync(ProductCategory category, CancellationToken ct = default);
     }
 }

@@ -100,7 +100,7 @@ namespace InventoryManagementSystem.Features.PurchaseOrders.Repository
             return await cmd.ExecuteNonQueryAsync(ct) > 0;
         }
 
-        private static PurchaseOrder MapPO(MySqlDataReader r) => new()
+        private static PurchaseOrder MapPO(System.Data.Common.DbDataReader r) => new()
         {
             PurchaseOrderId = r["PurchaseOrderId"].ToString()!, SupplierId = r["SupplierId"].ToString()!,
             SupplierName = r["SupplierName"].ToString()!, OrderDate = Convert.ToDateTime(r["OrderDate"]),

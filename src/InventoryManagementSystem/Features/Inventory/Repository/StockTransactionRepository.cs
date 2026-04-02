@@ -45,6 +45,29 @@ namespace InventoryManagementSystem.Features.Inventory.Repository
             return list;
         }
 
+        /// <summary>Overload: filter by warehouseId (nullable) and cap results with limit.</summary>
+        public async Task<List<StockTransaction>> GetByProductAsync(
+            string productId, string? warehouseId, int limit, CancellationToken ct = default)
+        {
+            var list = new List<StockTransaction>();
+            await using var conn = _factory.CreateConnection();
+            await conn.OpenAsync(ct);
+            var warehouseFilter = warehouseId != null ? "AND st.WarehouseId=@wid" : "";
+            var sql = $@"SELECT st.TransactionId,st.ProductId,p.ProductName,st.WarehouseId,w.WarehouseName,
+                                st.TransactionType,st.Quantity,st.TransactionDate,st.Reference
+                         FROM StockTransaction st
+                         JOIN Product p ON p.ProductId=st.ProductId
+                         JOIN Warehouse w ON w.WarehouseId=st.WarehouseId
+                         WHERE st.ProductId=@pid {warehouseFilter}
+                         ORDER BY st.TransactionDate ASC LIMIT {limit}";
+            await using var cmd = new MySqlCommand(sql, conn);
+            cmd.Parameters.AddWithValue("@pid", productId);
+            if (warehouseId != null) cmd.Parameters.AddWithValue("@wid", warehouseId);
+            await using var rdr = await cmd.ExecuteReaderAsync(ct);
+            while (await rdr.ReadAsync(ct)) list.Add(Map(rdr));
+            return list;
+        }
+
         // Unit of Work overload — insert within caller's transaction
         public async Task InsertAsync(StockTransaction t,
             MySqlConnection conn, MySqlTransaction dbTxn, CancellationToken ct = default)
@@ -62,7 +85,7 @@ namespace InventoryManagementSystem.Features.Inventory.Repository
             await cmd.ExecuteNonQueryAsync(ct);
         }
 
-        private static StockTransaction Map(MySqlDataReader r) => new()
+        private static StockTransaction Map(System.Data.Common.DbDataReader r) => new()
         {
             TransactionId   = r["TransactionId"].ToString()!,
             ProductId       = r["ProductId"].ToString()!,

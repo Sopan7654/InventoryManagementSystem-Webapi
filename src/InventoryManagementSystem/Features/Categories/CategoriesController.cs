@@ -1,6 +1,7 @@
 // Features/Categories/CategoriesController.cs
 using MediatR; using Microsoft.AspNetCore.Mvc;
 using InventoryManagementSystem.Features.Categories.Commands.CreateCategory;
+using InventoryManagementSystem.Features.Categories.Commands.UpdateCategory;
 using InventoryManagementSystem.Features.Categories.Queries.GetAllCategories;
 namespace InventoryManagementSystem.Features.Categories
 {
@@ -19,6 +20,15 @@ namespace InventoryManagementSystem.Features.Categories
         {
             var result = await _mediator.Send(cmd, ct);
             return StatusCode(201, new { success = true, categoryId = result.Value });
+        }
+
+        /// <summary>Update an existing category's name, description, or parent.</summary>
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(string id, [FromBody] UpdateCategoryCommand cmd, CancellationToken ct)
+        {
+            var updatedCmd = cmd with { CategoryId = id };
+            var result = await _mediator.Send(updatedCmd, ct);
+            return Ok(new { success = true, message = result.Value });
         }
     }
 }

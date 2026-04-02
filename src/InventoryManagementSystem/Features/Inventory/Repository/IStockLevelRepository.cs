@@ -11,6 +11,9 @@ namespace InventoryManagementSystem.Features.Inventory.Repository
         Task<StockLevel?> GetByProductAndWarehouseAsync(string productId, string warehouseId, CancellationToken ct = default);
         Task<List<StockLevel>> GetLowStockAsync(CancellationToken ct = default);
 
+        /// <summary>Returns all stock level rows for a given product (across all or one warehouse).</summary>
+        Task<List<StockLevel>> GetByProductAsync(string productId, CancellationToken ct = default);
+
         // These overloads accept an existing connection+transaction for Unit of Work usage
         Task UpsertAsync(string productId, string warehouseId, decimal qtyDelta,
             MySqlConnection conn, MySqlTransaction txn, CancellationToken ct = default);

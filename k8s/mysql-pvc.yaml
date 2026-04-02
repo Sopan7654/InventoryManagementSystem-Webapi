@@ -1,0 +1,20 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# PersistentVolumeClaim — durable storage for MySQL data directory
+# Prevents data loss when the MySQL pod is rescheduled.
+#
+# Apply: kubectl apply -f k8s/mysql-pvc.yaml
+# ─────────────────────────────────────────────────────────────────────────────
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pvc
+  namespace: inventory-system
+  labels:
+    app.kubernetes.io/component: database
+spec:
+  accessModes:
+    - ReadWriteOnce      # Single node read-write (standard for databases)
+  resources:
+    requests:
+      storage: 5Gi       # 5 GB for MySQL data — adjust as needed
+  # storageClassName: standard   # Uncomment and set to your cluster's StorageClass

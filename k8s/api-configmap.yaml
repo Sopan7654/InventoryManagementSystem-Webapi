@@ -1,0 +1,24 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# ConfigMap — non-sensitive configuration for the ASP.NET Core API
+#
+# Sensitive values (connection strings, passwords) are stored in mysql-secret.yaml
+# Apply: kubectl apply -f k8s/api-configmap.yaml
+# ─────────────────────────────────────────────────────────────────────────────
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: api-config
+  namespace: inventory-system
+  labels:
+    app: api
+    app.kubernetes.io/component: backend
+data:
+  # ASP.NET Core host configuration
+  ASPNETCORE_ENVIRONMENT: "Production"
+  ASPNETCORE_URLS: "http://+:8080"
+
+  # Application-level settings (maps to AppSettings section in appsettings.json)
+  AppSettings__DefaultValuationMethod: "FIFO"
+  AppSettings__LowStockAlertEnabled: "true"
+  AppSettings__AppName: "Inventory Management System"
+  AppSettings__Version: "1.0.0"

@@ -8,5 +8,6 @@ namespace InventoryManagementSystem.Features.Warehouses.Repository
         Task<List<Warehouse>> GetAllAsync(CancellationToken ct = default);
         Task<Warehouse?> GetByIdAsync(string id, CancellationToken ct = default);
         Task InsertAsync(Warehouse warehouse, CancellationToken ct = default);
+        Task<bool> UpdateAsync(Warehouse warehouse, CancellationToken ct = default);
     }
 }

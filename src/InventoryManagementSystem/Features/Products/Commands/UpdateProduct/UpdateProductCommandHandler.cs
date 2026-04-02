@@ -1,6 +1,7 @@
 // Features/Products/Commands/UpdateProduct/UpdateProductCommandHandler.cs
 using MediatR;
 using InventoryManagementSystem.Common.Exceptions;
+using InventoryManagementSystem.Common.Interfaces;
 using InventoryManagementSystem.Common.Models;
 using InventoryManagementSystem.Features.Products.Repository;
 
@@ -10,8 +11,13 @@ namespace InventoryManagementSystem.Features.Products.Commands.UpdateProduct
         : IRequestHandler<UpdateProductCommand, Result<bool>>
     {
         private readonly IProductRepository _repo;
+        private readonly ICacheService _cache;
 
-        public UpdateProductCommandHandler(IProductRepository repo) => _repo = repo;
+        public UpdateProductCommandHandler(IProductRepository repo, ICacheService cache)
+        {
+            _repo = repo;
+            _cache = cache;
+        }
 
         public async Task<Result<bool>> Handle(
             UpdateProductCommand cmd, CancellationToken cancellationToken)
@@ -32,6 +38,7 @@ namespace InventoryManagementSystem.Features.Products.Commands.UpdateProduct
             existing.IsActive      = cmd.IsActive;
 
             var updated = await _repo.UpdateAsync(existing, cancellationToken);
+            await _cache.RemoveAsync("products_all", cancellationToken);
             return Result<bool>.Success(updated);
         }
     }
